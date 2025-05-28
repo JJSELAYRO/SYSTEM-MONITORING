@@ -1,22 +1,32 @@
-CREATE DATABASE IF NOT EXISTS apartment_db;
+-- Switch to the correct database
 USE apartment_db;
 
--- USERS TABLE
+-- Table: users
 CREATE TABLE users (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('admin','tenant') NOT NULL
+    role ENUM('admin', 'tenant') NOT NULL
 );
 
--- ADMINS TABLE
+-- Table: admins
 CREATE TABLE admins (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     password VARCHAR(255) NOT NULL
 );
 
--- TENANTS TABLE
+-- Table: rooms
+CREATE TABLE rooms (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    number VARCHAR(10) NOT NULL,
+    floor INT(11) NOT NULL,
+    status ENUM('vacant','occupied','maintenance') DEFAULT 'vacant',
+    description TEXT,
+    image_path VARCHAR(255)
+);
+
+-- Table: tenants
 CREATE TABLE tenants (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -31,17 +41,7 @@ CREATE TABLE tenants (
     FOREIGN KEY (apartment_id) REFERENCES rooms(id) ON DELETE SET NULL
 );
 
--- ROOMS TABLE
-CREATE TABLE rooms (
-    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    number VARCHAR(10) NOT NULL,
-    floor INT(11) NOT NULL,
-    status ENUM('vacant','occupied','maintenance') DEFAULT 'vacant',
-    description TEXT,
-    image_path VARCHAR(255)
-);
-
--- APPLICATIONS TABLE
+-- Table: applications
 CREATE TABLE applications (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     room_id INT(11) NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE applications (
     FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
 );
 
--- ROOM APPLICATIONS TABLE
+-- Table: room_applications
 CREATE TABLE room_applications (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     room_id INT(11),
@@ -66,7 +66,7 @@ CREATE TABLE room_applications (
     FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE SET NULL
 );
 
--- PAYMENTS TABLE
+-- Table: payments
 CREATE TABLE payments (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     tenant_id INT(11),
@@ -78,7 +78,7 @@ CREATE TABLE payments (
     FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE SET NULL
 );
 
--- MAINTENANCE TABLE
+-- Table: maintenance
 CREATE TABLE maintenance (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     apartment_id INT(11),
@@ -86,11 +86,11 @@ CREATE TABLE maintenance (
     description TEXT,
     status ENUM('open','in_progress','closed') DEFAULT 'open',
     date_reported DATE NOT NULL,
-    FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE SET NULL,
-    FOREIGN KEY (apartment_id) REFERENCES rooms(id) ON DELETE SET NULL
+    FOREIGN KEY (apartment_id) REFERENCES rooms(id) ON DELETE SET NULL,
+    FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE SET NULL
 );
 
--- MAINTENANCE REQUESTS TABLE
+-- Table: maintenance_requests
 CREATE TABLE maintenance_requests (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     tenant_id INT(11) NOT NULL,
@@ -102,7 +102,7 @@ CREATE TABLE maintenance_requests (
     FOREIGN KEY (apartment_id) REFERENCES rooms(id) ON DELETE SET NULL
 );
 
--- MESSAGES TABLE
+-- Table: messages
 CREATE TABLE messages (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     tenant_id INT(11) NOT NULL,
@@ -114,7 +114,7 @@ CREATE TABLE messages (
     FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
 );
 
--- NOTIFICATIONS TABLE
+-- Table: notifications
 CREATE TABLE notifications (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     tenant_id INT(11) NOT NULL,
@@ -127,7 +127,7 @@ CREATE TABLE notifications (
     FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE SET NULL
 );
 
--- ADMIN NOTIFICATIONS TABLE
+-- Table: admin_notifications
 CREATE TABLE admin_notifications (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id INT(11) NOT NULL,
